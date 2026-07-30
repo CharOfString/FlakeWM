@@ -216,12 +216,33 @@ add_subdirectory(
 # path to avoid affecting other dependencies configured later.
 set(ENV{PKG_CONFIG_PATH} "${_flakewm_saved_pkg_config_path}")
 
+# Install the vendored Wlroots in a FlakeWM-private directory. Installing it
+# directly into CMAKE_INSTALL_LIBDIR could overwrite a system Wlroots with the
+# same SONAME (libwlroots-0.19.so).
+set(FLAKEWM_VENDOR_WLROOTS_INSTALL_DIR
+  "${CMAKE_INSTALL_LIBDIR}/flakewm"
+)
+install(FILES
+  "${FLAKEWM_VENDOR_WLROOTS_BINARY_DIR}/libwlroots-0.19.so"
+  DESTINATION "${FLAKEWM_VENDOR_WLROOTS_INSTALL_DIR}"
+  COMPONENT Runtime
+)
+
 # QWlroots and Waylib server will use Wlroots generated headers and shared
-# library, so we must wait for flakewm-vendor-wlroots to finish.
+# library. Add the Meson build directory to their build-only link search path,
+# then make them wait for flakewm-vendor-wlroots to finish. At install time,
+# make each direct consumer load the private copy next to its normal library
+# directory instead of a system Wlroots with the same SONAME.
 # TARGET check allows some optional targets not created by the current
 # Waylib configuration.
 foreach(vendor_target qwlroots waylibserver)
   if(TARGET "${vendor_target}")
+    target_link_directories("${vendor_target}" BEFORE PUBLIC
+      "$<BUILD_INTERFACE:${FLAKEWM_VENDOR_WLROOTS_BINARY_DIR}>"
+    )
     add_dependencies("${vendor_target}" flakewm-vendor-wlroots)
+    set_property(TARGET "${vendor_target}" APPEND PROPERTY
+      INSTALL_RPATH "$ORIGIN/flakewm"
+    )
   endif()
 endforeach()
