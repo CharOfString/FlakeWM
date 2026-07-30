@@ -130,7 +130,7 @@ string(REGEX REPLACE "libdir=[^\n]*"
 )
 
 string(REGEX REPLACE "Cflags:[^\n]*"
-  "Cflags: -I${FLAKEWM_VENDOR_WLROOTS_BINARY_DIR}/include -I${FLAKEWM_VENDOR_WLROOTS_SOURCE_DIR}/include"
+  "Cflags: -I${FLAKEWM_VENDOR_WLROOTS_BINARY_DIR}/include -I${FLAKEWM_VENDOR_WLROOTS_BINARY_DIR}/protocol -I${FLAKEWM_VENDOR_WLROOTS_SOURCE_DIR}/include"
   _flakewm_wlroots_pc "${_flakewm_wlroots_pc}"
 )
 

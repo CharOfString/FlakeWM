@@ -97,7 +97,9 @@ target_link_libraries(flakewm PRIVATE
 )
 
 target_include_directories(flakewm PRIVATE
+  "${CMAKE_CURRENT_SOURCE_DIR}/"
   "${CMAKE_CURRENT_SOURCE_DIR}/src"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/core/compositor"
 )
 
 install(TARGETS flakewm
